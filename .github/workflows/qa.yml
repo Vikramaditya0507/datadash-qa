@@ -1,21 +1,38 @@
-const { chromium } = require('playwright');
+name: DataDash QA
 
-(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-  let total = 0;
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
-  for (let seed = 72; seed <= 81; seed++) {
-    const url = `https://sanand0.github.io/tdsdata/js_table/?seed=${seed}`;
-    await page.goto(url, { waitUntil: 'networkidle' });
-    const numbers = await page.$$eval('td', cells =>
-      cells.map(c => parseFloat(c.innerText)).filter(n => !isNaN(n))
-    );
-    const seedSum = numbers.reduce((a, b) => a + b, 0);
-    console.log(`Seed ${seed}: sum = ${seedSum}`);
-    total += seedSum;
-  }
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-  console.log(`TOTAL SUM: ${Math.round(total)}`);
-  await browser.close();
-})();
+      - name: 24f2008173@ds.study.iitm.ac.in - Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install playwright
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Scraper
+        run: node scraper.js
+```
+
+Click **Commit changes** (green button)
+
+---
+
+**Fix Step 2: Update scraper.js**
+
+👉 Click this link:
+```
+https://github.com/Vikramaditya0507/datadash-qa/edit/main/scraper.js
