@@ -1,27 +1,21 @@
 name: DataDash QA
-
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
 jobs:
   scrape:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: 24f2008173@ds.study.iitm.ac.in - Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
       - name: Install dependencies
         run: npm install playwright
-
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-
       - name: Run Scraper
         run: node scraper.js
