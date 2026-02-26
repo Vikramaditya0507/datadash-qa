@@ -1,42 +1,21 @@
-name: DataDash QA
+const { chromium } = require('playwright');
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  let total = 0;
 
-jobs:
-  scrape:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  for (let seed = 72; seed <= 81; seed++) {
+    const url = `https://sanand0.github.io/tdsdata/js_table/?seed=${seed}`;
+    await page.goto(url, { waitUntil: 'networkidle' });
+    const numbers = await page.$$eval('td', cells =>
+      cells.map(c => parseFloat(c.innerText)).filter(n => !isNaN(n))
+    );
+    const seedSum = numbers.reduce((a, b) => a + b, 0);
+    console.log(`Seed ${seed}: sum = ${seedSum}`);
+    total += seedSum;
+  }
 
-      - name: 24f2008173@ds.study.iitm.ac.in - Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Playwright
-        run: |
-          npm init -y
-          npm install playwright
-          npx playwright install chromium --with-deps
-
-      - name: Run Scraper
-        run: node scraper.js
-```
-- Scroll down → click green **Commit new file**
-
----
-
-**Step 2: Create the scraper file**
-
-👉 Click this link:
-```
-https://github.com/Vikramaditya0507/datadash-qa/new/main
-```
-
-- In the filename box type:
-```
-scraper.js
+  console.log(`TOTAL SUM: ${Math.round(total)}`);
+  await browser.close();
+})();
